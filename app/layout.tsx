@@ -4,7 +4,7 @@ import "./globals.css";
 import { AppNavbar } from "@/components/app-navbar";
 import { Toaster } from "sonner";
 import RequireAuth from "@/components/require-auth";
-import { AuthProvider } from "@/lib/useAuth";
+import { AuthProvider } from "@/components/useAuth";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
