@@ -1,10 +1,25 @@
+# Dependencies
 node_modules/
+
+# Next.js
 .next/
+out
+out/
+/out/
+
+# Environment files
 .env.local
 .env
+
+# Build outputs
 dist/
 build/
+
+# Logs
 *.log
+
+# System files
 .DS_Store
+
+# Components
 components/logo.png
-out/
