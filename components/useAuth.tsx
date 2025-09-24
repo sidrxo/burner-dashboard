@@ -10,6 +10,7 @@ type AppUser = {
   email: string | null;
   role: "siteAdmin" | "venueAdmin" | "subAdmin" | "user";
   venueId?: string | null;
+  active: boolean;
 };
 
 type AuthContextType = {
@@ -31,23 +32,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const adminDoc = await getDoc(doc(db, "admins", firebaseUser.uid));
           if (adminDoc.exists()) {
             const data = adminDoc.data();
-            setUser({
+            const userData = {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
               role: data.role,
               venueId: data.venueId || null,
-            });
+              active: data.active !== false, // Default to true if not specified
+            };
+            
+            // Only set user if they are active
+            if (userData.active) {
+              setUser(userData);
+            } else {
+              // Sign out inactive user
+              await auth.signOut();
+              setUser(null);
+            }
           } else {
             // If not found in admins, try users collection
             const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
             if (userDoc.exists()) {
               const data = userDoc.data();
-              setUser({
+              const userData = {
                 uid: firebaseUser.uid,
                 email: firebaseUser.email,
                 role: data.role || "user",
                 venueId: data.venueId || null,
-              });
+                active: data.active !== false, // Default to true if not specified
+              };
+              
+              // Only set user if they are active
+              if (userData.active) {
+                setUser(userData);
+              } else {
+                // Sign out inactive user
+                await auth.signOut();
+                setUser(null);
+              }
             } else {
               // Default to regular user if not found in either collection
               setUser({
@@ -55,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 email: firebaseUser.email,
                 role: "user",
                 venueId: null,
+                active: true,
               });
             }
           }
@@ -66,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: firebaseUser.email,
             role: "user",
             venueId: null,
+            active: true,
           });
         }
       } else {

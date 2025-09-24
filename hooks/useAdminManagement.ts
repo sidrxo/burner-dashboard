@@ -12,23 +12,19 @@ import {
   query,
   where 
 } from "firebase/firestore";
-import { 
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut 
-} from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { toast } from "sonner";
 
 export interface Admin {
   id: string;
   email: string;
   name: string;
-  role: 'venueAdmin' | 'subAdmin';
+  role: 'venueAdmin' | 'subAdmin' | 'siteAdmin';
   venueId?: string;
   createdAt: Date;
   lastLogin?: Date;
   active: boolean;
+  tempPassword?: boolean;
 }
 
 export interface Venue {
@@ -42,7 +38,7 @@ export interface Venue {
 export interface CreateAdminData {
   email: string;
   name: string;
-  role: 'venueAdmin' | 'subAdmin';
+  role: 'venueAdmin' | 'subAdmin' | 'siteAdmin';
   venueId?: string;
 }
 
@@ -69,16 +65,15 @@ export function useAdminManagement() {
       } as Venue));
       setVenues(venuesData);
 
-      // Load admins (users with venueAdmin or subAdmin roles)
-      const usersSnap = await getDocs(collection(db, "users"));
-      const adminsData = usersSnap.docs
+      // Load admins from the /admins/ collection
+      const adminsSnap = await getDocs(collection(db, "admins"));
+      const adminsData = adminsSnap.docs
         .map(doc => ({
           id: doc.id,
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
           lastLogin: doc.data().lastLogin?.toDate()
-        } as Admin))
-        .filter(user => user.role === 'venueAdmin' || user.role === 'subAdmin');
+        } as Admin));
       
       setAdmins(adminsData);
     } catch (error) {
@@ -91,44 +86,25 @@ export function useAdminManagement() {
 
   const createAdmin = async (adminData: CreateAdminData) => {
     try {
-      // Generate temporary password
-      const tempPassword = generateTempPassword();
-      
-      // Create Firebase Auth user
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        adminData.email, 
-        tempPassword
-      );
-      
-      // Create user document in Firestore
-      const userDoc = {
+      // Create admin document in Firestore /admins/ collection
+      const adminDoc = {
         email: adminData.email,
         name: adminData.name,
         role: adminData.role,
         venueId: adminData.venueId || null,
         createdAt: new Date(),
         active: true,
-        tempPassword: true // Flag to force password change on first login
+        tempPassword: true // Flag to indicate they need to set up their account
       };
 
-      await addDoc(collection(db, "users"), {
-        ...userDoc,
-        uid: userCredential.user.uid
-      });
+      await addDoc(collection(db, "admins"), adminDoc);
 
-      // Send password reset email for them to set their own password
-      await sendPasswordResetEmail(auth, adminData.email);
-      
-      // Sign out the newly created user (we don't want to log them in)
-      await signOut(auth);
-
-      toast.success(`Admin created successfully! Password reset email sent to ${adminData.email}`);
+      toast.success(`Admin created successfully! They will need to sign up with the email: ${adminData.email}`);
       
       // Reload data
       await loadData();
       
-      return { success: true, tempPassword };
+      return { success: true };
     } catch (error: any) {
       console.error("Error creating admin:", error);
       toast.error(`Failed to create admin: ${error.message}`);
@@ -138,7 +114,7 @@ export function useAdminManagement() {
 
   const deleteAdmin = async (adminId: string) => {
     try {
-      await deleteDoc(doc(db, "users", adminId));
+      await deleteDoc(doc(db, "admins", adminId));
       toast.success("Admin deleted successfully");
       await loadData();
     } catch (error) {
@@ -149,22 +125,16 @@ export function useAdminManagement() {
 
   const updateAdmin = async (adminId: string, updates: Partial<Admin>) => {
     try {
-      await updateDoc(doc(db, "users", adminId), updates);
+      // Remove id from updates to avoid Firestore error
+      const { id, createdAt, ...cleanUpdates } = updates;
+      
+      await updateDoc(doc(db, "admins", adminId), cleanUpdates);
       toast.success("Admin updated successfully");
       await loadData();
     } catch (error) {
       console.error("Error updating admin:", error);
       toast.error("Failed to update admin");
     }
-  };
-
-  const generateTempPassword = (): string => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
   };
 
   return {

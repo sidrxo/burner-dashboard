@@ -55,11 +55,16 @@ export function useTicketsData() {
     setLoading(true);
     try {
       const snap = await getDocs(collectionGroup(db, "tickets"));
-      let allTickets = snap.docs.map(doc => ({
-        id: doc.id,
-        docRef: doc.ref,
-        ...doc.data(),
-      } as Ticket));
+      let allTickets = snap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          docRef: doc.ref,
+          ...data,
+          // Ensure ticketPrice is always a valid number
+          ticketPrice: typeof data.ticketPrice === 'number' && !isNaN(data.ticketPrice) ? data.ticketPrice : 0,
+        } as Ticket;
+      });
 
       // Filter by venue for venue admins and sub-admins
       if (user.role === "venueAdmin" || user.role === "subAdmin") {
@@ -99,7 +104,9 @@ export function useTicketsData() {
       
       const group = groups[eventKey];
       group.tickets.push(ticket);
-      group.totalRevenue += ticket.ticketPrice || 0;
+      // Safely add ticketPrice with fallback to 0
+      const price = typeof ticket.ticketPrice === 'number' && !isNaN(ticket.ticketPrice) ? ticket.ticketPrice : 0;
+      group.totalRevenue += price;
       group.totalCount++;
       if (ticket.isUsed) {
         group.usedCount++;
@@ -159,7 +166,11 @@ export function useTicketsData() {
   const stats: TicketsStats = {
     totalTickets: tickets.length,
     usedTickets: tickets.filter(t => t.isUsed).length,
-    totalRevenue: tickets.reduce((sum, t) => sum + t.ticketPrice, 0),
+    // Safely calculate total revenue with proper null checking
+    totalRevenue: tickets.reduce((sum, t) => {
+      const price = typeof t.ticketPrice === 'number' && !isNaN(t.ticketPrice) ? t.ticketPrice : 0;
+      return sum + price;
+    }, 0),
     activeEvents: eventGroups.length
   };
 
