@@ -13,7 +13,7 @@ import { db } from "@/lib/firebase";
 export function AppNavbar() {
   const pathname = usePathname();
   const { user } = useAuth(); // { uid, role, venueId }
-  const [venueName, setVenueName] = useState<string>("Management");
+  const [venueName, setVenueName] = useState<string>("");
 
   // Fetch venue name when user changes
   useEffect(() => {
@@ -22,16 +22,16 @@ export function AppNavbar() {
         try {
           const venueDoc = await getDoc(doc(db, "venues", user.venueId));
           if (venueDoc.exists()) {
-            setVenueName(venueDoc.data().name || "Management");
+            setVenueName(venueDoc.data().name);
           }
         } catch (error) {
           console.error("Error fetching venue name:", error);
-          setVenueName("Management");
+          setVenueName("");
         }
       } else if (user?.role === "siteAdmin") {
-        setVenueName("Site");
+        setVenueName("BURNER");
       } else {
-        setVenueName("Management");
+        setVenueName("");
       }
     };
 
@@ -68,7 +68,7 @@ export function AppNavbar() {
       <div className="w-full px-6 flex h-16 items-center relative">
         {/* Logo with Dynamic Venue Name */}
         <div className="absolute left-6 flex items-center space-x-2">
-          <h1 className="text-xl font-bold">{venueName} Management</h1>
+          <h1 className="text-xl font-bold">{venueName}</h1>
         </div>
 
         {/* Centered Navigation */}

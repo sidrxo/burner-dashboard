@@ -7,7 +7,7 @@ import {
   VenuesHeader,
   CreateVenueForm,
   EmptyVenuesState,
-  VenueCard
+  VenueGridCard
 } from "@/components/venues/VenuesComponents";
 
 function VenuesPageContent() {
@@ -15,8 +15,6 @@ function VenuesPageContent() {
     user,
     loading,
     venues,
-    newAdminEmail,
-    setNewAdminEmail,
     actionLoading,
     newVenueName,
     setNewVenueName,
@@ -26,8 +24,6 @@ function VenuesPageContent() {
     setShowCreateVenueDialog,
     handleCreateVenueWithAdmin,
     handleRemoveVenue,
-    handleAddAdmin,
-    handleRemoveAdmin,
     resetCreateForm
   } = useVenuesData();
 
@@ -71,17 +67,13 @@ function VenuesPageContent() {
           setShowCreateVenueDialog={setShowCreateVenueDialog}
         />
       ) : (
-        <div className="grid gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {venues.map((venue) => (
-            <VenueCard
+            <VenueGridCard
               key={venue.id}
               venue={venue}
               user={user}
-              newAdminEmail={newAdminEmail}
-              setNewAdminEmail={setNewAdminEmail}
               actionLoading={actionLoading}
-              handleAddAdmin={handleAddAdmin}
-              handleRemoveAdmin={handleRemoveAdmin}
               handleRemoveVenue={handleRemoveVenue}
             />
           ))}

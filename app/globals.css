@@ -12,8 +12,8 @@
   --color-popover: #1e1e1e;
   --color-popover-foreground: #ffffff;
   
-  /* Primary - Purple accent */
-  --color-primary: #bb86fc;
+  /* Primary - White accent */
+  --color-primary: #ffffff;
   --color-primary-foreground: #000000;
   
   /* Secondary - Clean whites/grays */
@@ -35,17 +35,17 @@
   /* Borders and inputs */
   --color-border: #3a3a3a;
   --color-input: #2a2a2a;
-  --color-ring: #bb86fc;
+  --color-ring: #ffffff;
   
   /* Sidebar specific colors */
   --color-sidebar: #1a1a1a;
   --color-sidebar-foreground: #ffffff;
-  --color-sidebar-primary: #bb86fc;
+  --color-sidebar-primary: #ffffff;
   --color-sidebar-primary-foreground: #000000;
   --color-sidebar-accent: #2a2a2a;
   --color-sidebar-accent-foreground: #ffffff;
   --color-sidebar-border: #3a3a3a;
-  --color-sidebar-ring: #bb86fc;
+  --color-sidebar-ring: #ffffff;
   
   /* Border radius */
   --radius-sm: 0.25rem;
@@ -106,12 +106,12 @@
     /* Light theme sidebar (fallback) */
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 270 95% 75%;
+    --sidebar-primary: 0 0% 100%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 270 95% 75%;
+    --sidebar-ring: 0 0% 100%;
   }
 
   /* Dark theme optimized for your design */
@@ -119,12 +119,12 @@
   :root {
     --sidebar: 0 0% 10%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 270 95% 75%;
+    --sidebar-primary: 0 0% 100%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 23%;
-    --sidebar-ring: 270 95% 75%;
+    --sidebar-ring: 0 0% 100%;
   }
 }
 

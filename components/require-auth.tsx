@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { LoginForm } from "./login-form"; // or wherever LoginForm is
+import { LoginForm } from "components/login-form"; // or wherever LoginForm is
 
 export default function RequireAuth({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

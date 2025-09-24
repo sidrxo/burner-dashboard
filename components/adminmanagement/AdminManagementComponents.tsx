@@ -22,12 +22,8 @@ import { Admin, Venue, CreateAdminData } from "@/hooks/useAdminManagement";
 export function AdminManagementHeader() {
   return (
     <div className="flex items-center space-x-4">
-      <Shield className="h-8 w-8 text-primary" />
-      <div>
+        <div>
         <h1 className="text-3xl font-bold tracking-tight">Admin Management</h1>
-        <p className="text-muted-foreground">
-          Manage venue admins, sub-admins, and site administrators
-        </p>
       </div>
     </div>
   );
