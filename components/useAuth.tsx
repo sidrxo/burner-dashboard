@@ -39,6 +39,17 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const functions = getFunctions(app);
 const auth = getAuth(app);
 
+// Helper function to validate role type
+function isValidRole(role: any): role is "siteAdmin" | "venueAdmin" | "subAdmin" | "user" {
+  return typeof role === 'string' && 
+         ['siteAdmin', 'venueAdmin', 'subAdmin', 'user'].includes(role);
+}
+
+// Helper function to validate venueId type
+function isValidVenueId(venueId: any): venueId is string | null {
+  return typeof venueId === 'string' || venueId === null || venueId === undefined;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
-        role: claims.role || "user",
-        venueId: claims.venueId || null,
+        role: isValidRole(claims.role) ? claims.role : "user",
+        venueId: isValidVenueId(claims.venueId) ? claims.venueId : null,
         active: claims.active !== false,
       };
     } catch (error) {
