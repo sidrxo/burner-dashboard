@@ -27,9 +27,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const userDoc = await getDoc(doc(db, "admins", firebaseUser.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
+          // First try to get admin data from /admins collection
+          const adminDoc = await getDoc(doc(db, "admins", firebaseUser.uid));
+          if (adminDoc.exists()) {
+            const data = adminDoc.data();
             setUser({
               uid: firebaseUser.uid,
               email: firebaseUser.email,
@@ -37,11 +38,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               venueId: data.venueId || null,
             });
           } else {
-            setUser(null);
+            // If not found in admins, try users collection
+            const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+            if (userDoc.exists()) {
+              const data = userDoc.data();
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                role: data.role || "user",
+                venueId: data.venueId || null,
+              });
+            } else {
+              // Default to regular user if not found in either collection
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                role: "user",
+                venueId: null,
+              });
+            }
           }
         } catch (err) {
           console.error("Failed to fetch user doc:", err);
-          setUser(null);
+          // Default to regular user on error
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            role: "user",
+            venueId: null,
+          });
         }
       } else {
         setUser(null);

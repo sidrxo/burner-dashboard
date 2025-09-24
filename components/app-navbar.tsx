@@ -42,7 +42,6 @@ export function AppNavbar() {
     { title: "Overview", url: "/overview", icon: Home },
     { title: "Events", url: "/events", icon: Calendar },
     { title: "Tickets", url: "/tickets", icon: Ticket },
-    { title: "Users", url: "/users", icon: Users },
     { title: "Account", url: "/account", icon: Settings },
   ];
 
