@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Home, Settings, Ticket, Users, MapPin } from "lucide-react";
+import { Calendar, Home, Settings, Ticket, Users, MapPin, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/useAuth"; // custom hook to get current user with role/venueId
@@ -54,6 +54,15 @@ export function AppNavbar() {
     });
   }
 
+  // Add "Admin Management" tab for siteAdmins only
+  if (user && user.role === "siteAdmin") {
+    navigationItems.splice(4, 0, {
+      title: "Admin Management",
+      url: "/admin-management",
+      icon: Shield,
+    });
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-full px-6 flex h-16 items-center relative">
@@ -63,25 +72,31 @@ export function AppNavbar() {
         </div>
 
         {/* Centered Navigation */}
-        <div className="flex-1 flex justify-center">
-          <nav className="flex items-center space-x-1">
+        <nav className="flex-1 flex items-center justify-center">
+          <div className="flex items-center space-x-6">
             {navigationItems.map((item) => {
-              const isActive = pathname.startsWith(item.url);
+              const Icon = item.icon;
+              const isActive = pathname === item.url;
               return (
-                <Link key={item.title} href={item.url}>
+                <Link key={item.url} href={item.url}>
                   <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="sm"
-                    className="flex items-center gap-2 px-4"
+                    variant={isActive ? "default" : "ghost"}
+                    className={cn(
+                      "flex items-center space-x-2 px-4 py-2",
+                      isActive && "bg-primary text-primary-foreground"
+                    )}
                   >
-                    <item.icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" />
                     <span>{item.title}</span>
                   </Button>
                 </Link>
               );
             })}
-          </nav>
-        </div>
+          </div>
+        </nav>
+
+        {/* Right side placeholder for balance */}
+        <div className="absolute right-6 w-20"></div>
       </div>
     </header>
   );
