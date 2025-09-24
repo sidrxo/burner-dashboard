@@ -9,6 +9,48 @@ import { Label } from "@/components/ui/label";
 import { Trash2, Plus, MapPin, Users, Settings } from "lucide-react";
 import Link from "next/link";
 
+// Type definitions
+interface User {
+  role: string;
+  email?: string | null; // Updated to match AppUser type
+}
+
+interface Venue {
+  id: string;
+  name: string;
+  admins?: string[]; // Updated to match the actual data structure from the hook
+}
+
+interface VenuesHeaderProps {
+  user: User;
+  showCreateVenueDialog: boolean;
+  setShowCreateVenueDialog: (show: boolean) => void;
+}
+
+interface CreateVenueFormProps {
+  showCreateVenueDialog: boolean;
+  setShowCreateVenueDialog: (show: boolean) => void;
+  newVenueName: string;
+  setNewVenueName: (name: string) => void;
+  newVenueAdminEmail: string;
+  setNewVenueAdminEmail: (email: string) => void;
+  actionLoading: boolean;
+  handleCreateVenueWithAdmin: (e: React.FormEvent) => void;
+  resetCreateForm: () => void;
+}
+
+interface EmptyVenuesStateProps {
+  user: User;
+  setShowCreateVenueDialog: (show: boolean) => void;
+}
+
+interface VenueCardProps {
+  venue: Venue;
+  user: User;
+  actionLoading: boolean;
+  handleRemoveVenue: (venueId: string) => void;
+}
+
 // Access Denied Component
 export function AccessDenied() {
   return (
@@ -23,7 +65,7 @@ export function AccessDenied() {
 }
 
 // Venues Header Component
-export function VenuesHeader({ user, showCreateVenueDialog, setShowCreateVenueDialog }) {
+export function VenuesHeader({ user, showCreateVenueDialog, setShowCreateVenueDialog }: VenuesHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
@@ -59,7 +101,7 @@ export function CreateVenueForm({
   actionLoading,
   handleCreateVenueWithAdmin,
   resetCreateForm
-}) {
+}: CreateVenueFormProps) {
   return (
     <Dialog open={showCreateVenueDialog} onOpenChange={setShowCreateVenueDialog}>
       <DialogContent>
@@ -111,7 +153,7 @@ export function CreateVenueForm({
 }
 
 // Empty Venues State Component
-export function EmptyVenuesState({ user, setShowCreateVenueDialog }) {
+export function EmptyVenuesState({ user, setShowCreateVenueDialog }: EmptyVenuesStateProps) {
   return (
     <Card className="text-center py-12">
       <CardContent>
@@ -134,7 +176,7 @@ export function EmptyVenuesState({ user, setShowCreateVenueDialog }) {
 }
 
 // New Grid Card Component for Venues
-export function VenueGridCard({ venue, user, actionLoading, handleRemoveVenue }) {
+export function VenueGridCard({ venue, user, actionLoading, handleRemoveVenue }: VenueCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
@@ -180,7 +222,7 @@ export function VenueGridCard({ venue, user, actionLoading, handleRemoveVenue })
               {venue.admins && venue.admins.length > 0 && (
                 <div className="pt-2 border-t">
                   <p className="text-xs text-muted-foreground mb-1">Primary Admin:</p>
-                  <p className="text-sm font-medium truncate">{venue.admins[0].email}</p>
+                  <p className="text-sm font-medium truncate">{venue.admins[0]}</p>
                 </div>
               )}
             </div>
@@ -222,7 +264,7 @@ export function VenueGridCard({ venue, user, actionLoading, handleRemoveVenue })
 }
 
 // Keep the original VenueCard component for backward compatibility if needed elsewhere
-export function VenueCard({ venue, user, actionLoading, handleRemoveVenue }) {
+export function VenueCard({ venue, user, actionLoading, handleRemoveVenue }: VenueCardProps) {
   return (
     <Card>
       <CardHeader>

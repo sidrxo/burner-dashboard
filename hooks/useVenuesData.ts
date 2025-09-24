@@ -56,7 +56,9 @@ export function useVenuesData() {
     }
   };
 
-  const handleCreateVenueWithAdmin = async () => {
+  const handleCreateVenueWithAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!newVenueName.trim() || !newVenueAdminEmail.trim()) {
       toast.error("Please fill in all fields");
       return;
@@ -116,7 +118,10 @@ export function useVenuesData() {
     }
   };
 
-  const handleRemoveVenue = async (venueId: string, venueName: string) => {
+  const handleRemoveVenue = async (venueId: string) => {
+    const venue = venues.find(v => v.id === venueId);
+    if (!venue) return;
+    
     setActionLoading(true);
     try {
       await deleteDoc(doc(db, "venues", venueId));
@@ -132,7 +137,7 @@ export function useVenuesData() {
       });
       await Promise.all(updatePromises);
 
-      toast.success(`Venue "${venueName}" and all associated admins removed successfully`);
+      toast.success(`Venue "${venue.name}" and all associated admins removed successfully`);
       fetchVenues();
     } catch (err) {
       console.error(err);
